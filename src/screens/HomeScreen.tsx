@@ -15,6 +15,9 @@ import { useAuth } from '../context/AuthContext';
 import { HomeScreenProps } from '../types/navigation';
 import { Layout } from '../constants/Layout';
 import { Contacts } from '../constants/Contacts';
+import { contactPastor } from '../utils/whatsapp';
+import { makePhoneCall } from '../utils/phone';
+import { shareApp } from '../utils/sharing';
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
