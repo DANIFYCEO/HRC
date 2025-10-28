@@ -45,9 +45,6 @@ if (isConfigured) {
   );
 }
 
-// Export Firebase services
-export { app, auth, firestore, storage };
-
 // Helper function to check if Firebase is configured
 export const isFirebaseConfigured = (): boolean => {
   return (
@@ -58,5 +55,31 @@ export const isFirebaseConfigured = (): boolean => {
     firebaseConfig.authDomain !== ''
   );
 };
+
+// Export Firebase services with fallback
+// These will throw errors if used before configuration
+export const getAuthInstance = (): Auth => {
+  if (!auth) {
+    throw new Error('Firebase Auth not initialized. Please configure Firebase first.');
+  }
+  return auth;
+};
+
+export const getFirestoreInstance = (): Firestore => {
+  if (!firestore) {
+    throw new Error('Firebase Firestore not initialized. Please configure Firebase first.');
+  }
+  return firestore;
+};
+
+export const getStorageInstance = (): FirebaseStorage => {
+  if (!storage) {
+    throw new Error('Firebase Storage not initialized. Please configure Firebase first.');
+  }
+  return storage;
+};
+
+// Export raw instances (may be undefined)
+export { app, auth, firestore, storage };
 
 export default app;
