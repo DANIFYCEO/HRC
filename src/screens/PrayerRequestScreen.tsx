@@ -1,0 +1,288 @@
+// PrayerRequestScreen - Submit prayer requests via WhatsApp
+
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
+import { PrayerRequestScreenProps } from '../types/navigation';
+import { Layout } from '../constants/Layout';
+import { sendPrayerRequest } from '../utils/whatsapp';
+import CustomInput from '../components/CustomInput';
+import CustomButton from '../components/CustomButton';
+
+const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation }) => {
+  const { colors } = useTheme();
+
+  // Form state
+  const [name, setName] = useState('');
+  const [request, setRequest] = useState('');
+  const [contact, setContact] = useState('');
+  const [urgency, setUrgency] = useState<'routine' | 'urgent'>('routine');
+  const [loading, setLoading] = useState(false);
+
+  // Validation errors
+  const [errors, setErrors] = useState({
+    name: '',
+    request: '',
+  });
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      padding: Layout.spacing.lg,
+    },
+    infoBanner: {
+      backgroundColor: `${colors.primary}20`,
+      borderRadius: Layout.borderRadius.lg,
+      padding: Layout.spacing.lg,
+      marginBottom: Layout.spacing.xl,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    infoIcon: {
+      marginRight: Layout.spacing.md,
+    },
+    infoText: {
+      flex: 1,
+      fontSize: Layout.fontSize.md,
+      color: colors.textPrimary,
+      lineHeight: 20,
+    },
+    sectionTitle: {
+      fontSize: Layout.fontSize.lg,
+      fontWeight: '600',
+      color: colors.textPrimary,
+      marginBottom: Layout.spacing.md,
+    },
+    urgencyContainer: {
+      marginBottom: Layout.spacing.lg,
+    },
+    urgencyOptions: {
+      flexDirection: 'row',
+      gap: Layout.spacing.md,
+    },
+    urgencyOption: {
+      flex: 1,
+      padding: Layout.spacing.lg,
+      borderRadius: Layout.borderRadius.md,
+      borderWidth: 2,
+      borderColor: colors.border,
+      alignItems: 'center',
+    },
+    urgencyOptionSelected: {
+      borderColor: colors.primary,
+      backgroundColor: `${colors.primary}10`,
+    },
+    urgencyLabel: {
+      fontSize: Layout.fontSize.md,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      marginTop: Layout.spacing.sm,
+    },
+    urgencyLabelSelected: {
+      color: colors.primary,
+    },
+    submitButton: {
+      marginTop: Layout.spacing.md,
+      marginBottom: Layout.spacing.xxl,
+    },
+  });
+
+  const validate = (): boolean => {
+    const newErrors = {
+      name: '',
+      request: '',
+    };
+
+    // Validate name
+    if (!name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+
+    // Validate request
+    if (!request.trim()) {
+      newErrors.request = 'Prayer request is required';
+    } else if (request.trim().length < 10) {
+      newErrors.request = 'Prayer request must be at least 10 characters';
+    }
+
+    setErrors(newErrors);
+    return !newErrors.name && !newErrors.request;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const success = await sendPrayerRequest(
+        name.trim(),
+        request.trim(),
+        contact.trim() || undefined,
+        urgency
+      );
+
+      if (success) {
+        // Show success message
+        Alert.alert(
+          'Prayer Request Sent',
+          'Your prayer request has been sent to Pastor via WhatsApp.',
+          [
+            {
+              text: 'Done',
+              onPress: () => {
+                // Clear form
+                setName('');
+                setRequest('');
+                setContact('');
+                setUrgency('routine');
+                // Navigate back
+                navigation.goBack();
+              },
+            },
+          ]
+        );
+      }
+    } catch (error) {
+      Alert.alert(
+        'Error',
+        'Failed to send prayer request. Please try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Information Banner */}
+        <View style={styles.infoBanner}>
+          <Ionicons
+            name="logo-whatsapp"
+            size={24}
+            color={colors.primary}
+            style={styles.infoIcon}
+          />
+          <Text style={styles.infoText}>
+            Your prayer request will be sent directly to Pastor's WhatsApp
+          </Text>
+        </View>
+
+        {/* Form Fields */}
+        <CustomInput
+          label="Your Name *"
+          placeholder="Enter your name"
+          value={name}
+          onChangeText={(text) => {
+            setName(text);
+            if (errors.name) setErrors({ ...errors, name: '' });
+          }}
+          error={errors.name}
+          autoCapitalize="words"
+        />
+
+        <CustomInput
+          label="Prayer Request *"
+          placeholder="Share your prayer request..."
+          value={request}
+          onChangeText={(text) => {
+            setRequest(text);
+            if (errors.request) setErrors({ ...errors, request: '' });
+          }}
+          error={errors.request}
+          multiline
+          numberOfLines={6}
+          textAlignVertical="top"
+        />
+
+        <CustomInput
+          label="Contact Information (Optional)"
+          placeholder="Phone or email (optional)"
+          value={contact}
+          onChangeText={setContact}
+          autoCapitalize="none"
+        />
+
+        {/* Urgency Selection */}
+        <View style={styles.urgencyContainer}>
+          <Text style={styles.sectionTitle}>Urgency Level</Text>
+          <View style={styles.urgencyOptions}>
+            <TouchableOpacity
+              style={[
+                styles.urgencyOption,
+                urgency === 'routine' && styles.urgencyOptionSelected,
+              ]}
+              onPress={() => setUrgency('routine')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="time-outline"
+                size={32}
+                color={urgency === 'routine' ? colors.primary : colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.urgencyLabel,
+                  urgency === 'routine' && styles.urgencyLabelSelected,
+                ]}
+              >
+                Routine
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.urgencyOption,
+                urgency === 'urgent' && styles.urgencyOptionSelected,
+              ]}
+              onPress={() => setUrgency('urgent')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="alert-circle-outline"
+                size={32}
+                color={urgency === 'urgent' ? colors.primary : colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.urgencyLabel,
+                  urgency === 'urgent' && styles.urgencyLabelSelected,
+                ]}
+              >
+                Urgent
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Submit Button */}
+        <CustomButton
+          title="Send to Pastor"
+          onPress={handleSubmit}
+          loading={loading}
+          disabled={loading}
+          style={styles.submitButton}
+        />
+      </ScrollView>
+    </View>
+  );
+};
+
+export default PrayerRequestScreen;
