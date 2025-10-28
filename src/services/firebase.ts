@@ -16,20 +16,33 @@ const firebaseConfig = {
   appId: Config.firebase.appId,
 };
 
-// Initialize Firebase
-let app: FirebaseApp;
-let auth: Auth;
-let firestore: Firestore;
-let storage: FirebaseStorage;
+// Initialize Firebase (only if configured)
+let app: FirebaseApp | undefined;
+let auth: Auth | undefined;
+let firestore: Firestore | undefined;
+let storage: FirebaseStorage | undefined;
 
-try {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  firestore = getFirestore(app);
-  storage = getStorage(app);
-} catch (error) {
-  console.error('Error initializing Firebase:', error);
-  throw new Error('Failed to initialize Firebase. Please check your configuration.');
+// Check if Firebase is configured before initializing
+const isConfigured = !!(
+  firebaseConfig.apiKey &&
+  firebaseConfig.projectId &&
+  firebaseConfig.apiKey !== '' &&
+  firebaseConfig.projectId !== ''
+);
+
+if (isConfigured) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    firestore = getFirestore(app);
+    storage = getStorage(app);
+  } catch (error) {
+    console.error('Error initializing Firebase:', error);
+  }
+} else {
+  console.warn(
+    'Firebase not configured. Please add Firebase credentials to src/constants/Config.ts'
+  );
 }
 
 // Export Firebase services
