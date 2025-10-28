@@ -11,7 +11,7 @@ import {
   User as FirebaseUser,
   onAuthStateChanged,
 } from 'firebase/auth';
-import { auth } from './firebase';
+import { getAuthInstance, auth, isFirebaseConfigured } from './firebase';
 
 /**
  * Sign up a new user with email and password
@@ -22,7 +22,8 @@ export const signUp = async (
   name: string
 ): Promise<FirebaseUser> => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const authInstance = getAuthInstance();
+    const userCredential = await createUserWithEmailAndPassword(authInstance, email, password);
 
     // Update display name
     if (userCredential.user) {
@@ -42,7 +43,8 @@ export const signUp = async (
  */
 export const signIn = async (email: string, password: string): Promise<FirebaseUser> => {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const authInstance = getAuthInstance();
+    const userCredential = await signInWithEmailAndPassword(authInstance, email, password);
     return userCredential.user;
   } catch (error: any) {
     throw new Error(error.message || 'Failed to sign in');
@@ -54,7 +56,8 @@ export const signIn = async (email: string, password: string): Promise<FirebaseU
  */
 export const logOut = async (): Promise<void> => {
   try {
-    await signOut(auth);
+    const authInstance = getAuthInstance();
+    await signOut(authInstance);
   } catch (error: any) {
     throw new Error(error.message || 'Failed to sign out');
   }
@@ -65,7 +68,8 @@ export const logOut = async (): Promise<void> => {
  */
 export const resetPassword = async (email: string): Promise<void> => {
   try {
-    await sendPasswordResetEmail(auth, email);
+    const authInstance = getAuthInstance();
+    await sendPasswordResetEmail(authInstance, email);
   } catch (error: any) {
     throw new Error(error.message || 'Failed to send password reset email');
   }
@@ -117,6 +121,9 @@ export const updateUserPassword = async (
  * Get current user
  */
 export const getCurrentUser = (): FirebaseUser | null => {
+  if (!isFirebaseConfigured() || !auth) {
+    return null;
+  }
   return auth.currentUser;
 };
 
@@ -124,6 +131,10 @@ export const getCurrentUser = (): FirebaseUser | null => {
  * Listen to auth state changes
  */
 export const onAuthChange = (callback: (user: FirebaseUser | null) => void) => {
+  if (!isFirebaseConfigured() || !auth) {
+    callback(null);
+    return () => {};
+  }
   return onAuthStateChanged(auth, callback);
 };
 
