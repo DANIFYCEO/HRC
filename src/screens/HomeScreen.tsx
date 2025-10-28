@@ -180,37 +180,25 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       id: 'whatsapp',
       icon: 'logo-whatsapp',
       title: 'WhatsApp Pastor',
-      onPress: () => {
-        // Will implement WhatsApp linking
-        console.log('WhatsApp Pastor');
-      },
+      onPress: () => contactPastor(),
     },
     {
       id: 'service',
       icon: 'time',
       title: 'Next Service',
-      onPress: () => {
-        // Will implement service info modal
-        console.log('Next Service');
-      },
+      onPress: () => navigation.navigate('MainTabs', { screen: 'Events' }),
     },
     {
       id: 'share',
       icon: 'share-social',
       title: 'Share App',
-      onPress: () => {
-        // Will implement share functionality
-        console.log('Share App');
-      },
+      onPress: () => shareApp(),
     },
     {
       id: 'call',
       icon: 'call',
       title: 'Call Office',
-      onPress: () => {
-        // Will implement phone dialing
-        console.log('Call Office');
-      },
+      onPress: () => makePhoneCall(Contacts.churchOffice),
     },
   ];
 
