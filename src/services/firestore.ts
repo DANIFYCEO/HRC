@@ -12,9 +12,8 @@ import {
   where,
   orderBy,
   Timestamp,
-  WhereFilterOp,
 } from 'firebase/firestore';
-import { firestore } from './firebase';
+import { getFirestoreInstance } from './firebase';
 import {
   FirestoreUser,
   FirestoreReadingProgress,
@@ -33,6 +32,7 @@ const APP_SETTINGS = 'app_settings';
  */
 export const createUser = async (uid: string, userData: Partial<FirestoreUser>): Promise<void> => {
   try {
+    const firestore = getFirestoreInstance();
     await setDoc(doc(firestore, USERS, uid), {
       ...userData,
       uid,
@@ -46,6 +46,7 @@ export const createUser = async (uid: string, userData: Partial<FirestoreUser>):
 
 export const getUser = async (uid: string): Promise<FirestoreUser | null> => {
   try {
+    const firestore = getFirestoreInstance();
     const userDoc = await getDoc(doc(firestore, USERS, uid));
     return userDoc.exists() ? (userDoc.data() as FirestoreUser) : null;
   } catch (error: any) {
@@ -55,6 +56,7 @@ export const getUser = async (uid: string): Promise<FirestoreUser | null> => {
 
 export const updateUser = async (uid: string, updates: Partial<FirestoreUser>): Promise<void> => {
   try {
+    const firestore = getFirestoreInstance();
     await updateDoc(doc(firestore, USERS, uid), {
       ...updates,
       updatedAt: Timestamp.now(),
@@ -71,6 +73,7 @@ export const createReadingProgress = async (
   progressData: Omit<FirestoreReadingProgress, 'createdAt' | 'updatedAt'>
 ): Promise<void> => {
   try {
+    const firestore = getFirestoreInstance();
     const progressId = `${progressData.userId}_${progressData.planId}`;
     await setDoc(doc(firestore, READING_PROGRESS, progressId), {
       ...progressData,
@@ -87,6 +90,7 @@ export const getReadingProgress = async (
   planId: string
 ): Promise<FirestoreReadingProgress | null> => {
   try {
+    const firestore = getFirestoreInstance();
     const progressId = `${userId}_${planId}`;
     const progressDoc = await getDoc(doc(firestore, READING_PROGRESS, progressId));
     return progressDoc.exists() ? (progressDoc.data() as FirestoreReadingProgress) : null;
@@ -101,6 +105,7 @@ export const updateReadingProgress = async (
   updates: Partial<FirestoreReadingProgress>
 ): Promise<void> => {
   try {
+    const firestore = getFirestoreInstance();
     const progressId = `${userId}_${planId}`;
     await updateDoc(doc(firestore, READING_PROGRESS, progressId), {
       ...updates,
@@ -118,6 +123,7 @@ export const createEvent = async (
   eventData: Omit<FirestoreEvent, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<string> => {
   try {
+    const firestore = getFirestoreInstance();
     const eventRef = doc(collection(firestore, EVENTS));
     await setDoc(eventRef, {
       ...eventData,
@@ -133,6 +139,7 @@ export const createEvent = async (
 
 export const getEvents = async (isRecurring?: boolean): Promise<FirestoreEvent[]> => {
   try {
+    const firestore = getFirestoreInstance();
     let q = query(collection(firestore, EVENTS), orderBy('dateTime', 'asc'));
 
     if (isRecurring !== undefined) {
@@ -152,6 +159,7 @@ export const getEvents = async (isRecurring?: boolean): Promise<FirestoreEvent[]
 
 export const getUpcomingEvents = async (): Promise<FirestoreEvent[]> => {
   try {
+    const firestore = getFirestoreInstance();
     const now = Timestamp.now();
     const q = query(
       collection(firestore, EVENTS),
@@ -172,6 +180,7 @@ export const updateEvent = async (
   updates: Partial<FirestoreEvent>
 ): Promise<void> => {
   try {
+    const firestore = getFirestoreInstance();
     await updateDoc(doc(firestore, EVENTS, eventId), {
       ...updates,
       updatedAt: Timestamp.now(),
@@ -183,6 +192,7 @@ export const updateEvent = async (
 
 export const deleteEvent = async (eventId: string): Promise<void> => {
   try {
+    const firestore = getFirestoreInstance();
     await deleteDoc(doc(firestore, EVENTS, eventId));
   } catch (error: any) {
     throw new Error(`Failed to delete event: ${error.message}`);
@@ -194,6 +204,7 @@ export const deleteEvent = async (eventId: string): Promise<void> => {
  */
 export const getAppSettings = async (): Promise<FirestoreAppSettings | null> => {
   try {
+    const firestore = getFirestoreInstance();
     const settingsDoc = await getDoc(doc(firestore, APP_SETTINGS, 'config'));
     return settingsDoc.exists() ? (settingsDoc.data() as FirestoreAppSettings) : null;
   } catch (error: any) {
@@ -205,6 +216,7 @@ export const updateAppSettings = async (
   updates: Partial<FirestoreAppSettings>
 ): Promise<void> => {
   try {
+    const firestore = getFirestoreInstance();
     await setDoc(doc(firestore, APP_SETTINGS, 'config'), updates, { merge: true });
   } catch (error: any) {
     throw new Error(`Failed to update app settings: ${error.message}`);
