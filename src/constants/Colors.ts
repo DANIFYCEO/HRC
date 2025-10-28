@@ -45,35 +45,43 @@ export const Colors = {
 
 // Light theme colors (for theme toggle)
 export const LightColors = {
+  // Background colors
   background: '#FFFFFF',
   backgroundCard: '#F9FAFB',
-  backgroundDark: '#1F2937',
+  backgroundLight: '#F5F5F5',
 
+  // Primary accent colors
   primary: '#7C3AED',
   primaryLight: '#9F67FF',
   primaryDark: '#5B21B6',
 
+  // Text colors
   textPrimary: '#1F2937',
   textSecondary: '#6B7280',
   textLight: '#9CA3AF',
-  textWhite: '#FFFFFF',
+  textDark: '#000000',
 
+  // Spiritual Resources icon colors
   iconGreen: '#10B981',
   iconOrange: '#F97316',
   iconPurple: '#A855F7',
   iconRed: '#EF4444',
 
+  // Semantic colors
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',
   info: '#3B82F6',
 
+  // Border colors
   border: '#E5E7EB',
-  borderDark: '#333333',
+  borderLight: '#D1D5DB',
 
+  // Tab navigation
   tabActive: '#7C3AED',
   tabInactive: '#9CA3AF',
 
+  // Card shadows and overlays
   shadow: 'rgba(0, 0, 0, 0.1)',
   overlay: 'rgba(0, 0, 0, 0.3)',
 };
