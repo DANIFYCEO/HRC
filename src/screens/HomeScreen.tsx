@@ -186,7 +186,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       id: 'service',
       icon: 'time',
       title: 'Next Service',
-      onPress: () => navigation.navigate('MainTabs', { screen: 'Events' }),
+      onPress: () => {
+        // Navigate to Events tab
+        navigation.getParent()?.navigate('Events');
+      },
     },
     {
       id: 'share',
