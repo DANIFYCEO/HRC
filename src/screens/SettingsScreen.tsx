@@ -126,7 +126,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ navigation }) => {
         },
         {
           text: 'Send',
-          onPress: (problem) => {
+          onPress: (problem?: string) => {
             if (problem && problem.trim()) {
               sendSupportRequest(problem);
             }
