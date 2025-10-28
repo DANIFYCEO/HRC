@@ -9,18 +9,19 @@ export const Config = {
   // API Configuration
   api: {
     bibleApiBaseUrl: 'https://api.scripture.api.bible/v1',
-    bibleApiKey: process.env.BIBLE_API_KEY || '',
+    bibleApiKey: '', // TODO: Add API key from https://scripture.api.bible
     defaultBibleTranslation: 'de4e12af7f28f599-02', // KJV Bible ID
   },
 
-  // Firebase Configuration (will be populated from environment variables)
+  // Firebase Configuration
+  // TODO: Replace with actual Firebase project credentials from Firebase Console
   firebase: {
-    apiKey: process.env.FIREBASE_API_KEY || '',
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN || '',
-    projectId: process.env.FIREBASE_PROJECT_ID || '',
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || '',
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '',
-    appId: process.env.FIREBASE_APP_ID || '',
+    apiKey: '',
+    authDomain: '',
+    projectId: '',
+    storageBucket: '',
+    messagingSenderId: '',
+    appId: '',
   },
 
   // Storage keys for AsyncStorage
