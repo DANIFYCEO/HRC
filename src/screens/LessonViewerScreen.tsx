@@ -234,14 +234,11 @@ const LessonViewerScreen: React.FC<LessonViewerScreenProps> = ({ route, navigati
           <Text style={styles.lessonSubtitle}>Lesson {lesson.id} of 24</Text>
         </View>
 
-        {/* Instructions Card */}
+        {/* Info Card */}
         <View style={styles.instructionsCard}>
-          <Text style={styles.instructionsTitle}>📚 How to Add This Lesson</Text>
+          <Text style={styles.instructionsTitle}>📚 About This Lesson</Text>
           <Text style={styles.instructionsText}>
-            To view this lesson, place the PDF file in your project's assets folder:
-          </Text>
-          <Text style={styles.filenameText}>
-            assets/lessons/{lesson.filename}
+            Tap "Open PDF" below to view this Sunday School lesson. The PDF will open in your device's default PDF viewer.
           </Text>
         </View>
 
