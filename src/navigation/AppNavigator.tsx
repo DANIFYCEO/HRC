@@ -68,7 +68,12 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="BibleScreen"
           component={BibleScreen}
-          options={{ title: 'Bible' }}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="BibleChapterScreen"
+          component={BibleChapterScreen}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="SundaySchoolScreen"
