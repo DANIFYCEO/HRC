@@ -42,6 +42,7 @@ export type HomeScreenProps = TabScreenProps<'Home'>;
 export type EventsScreenProps = TabScreenProps<'Events'>;
 export type SettingsScreenProps = TabScreenProps<'Settings'>;
 export type BibleScreenProps = StackScreenNavigationProp<'BibleScreen'>;
+export type BibleChapterScreenProps = StackScreenNavigationProp<'BibleChapterScreen'>;
 export type SundaySchoolScreenProps = StackScreenNavigationProp<'SundaySchoolScreen'>;
 export type LessonViewerScreenProps = StackScreenNavigationProp<'LessonViewerScreen'>;
 export type ReadingPlanScreenProps = StackScreenNavigationProp<'ReadingPlanScreen'>;
