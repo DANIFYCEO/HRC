@@ -10,6 +10,7 @@ export type RootStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
   BibleScreen: undefined;
+  BibleChapterScreen: { bookId: string; bookName: string; chapterNum: number };
   SundaySchoolScreen: undefined;
   LessonViewerScreen: { lessonId: number; lessonTitle: string };
   ReadingPlanScreen: undefined;
