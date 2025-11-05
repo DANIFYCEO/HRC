@@ -127,13 +127,81 @@ const LessonViewerScreen: React.FC<LessonViewerScreenProps> = ({ route, navigati
     },
   });
 
-  const handleOpenPDF = () => {
-    // TODO: Implement PDF opening once files are in assets
-    Alert.alert(
-      'PDF Not Available',
-      `The PDF file for "${lessonTitle}" should be placed in:\n\nassets/lessons/${lesson?.filename}\n\nOnce the file is added, it will open automatically.`,
-      [{ text: 'OK' }]
-    );
+  const handleOpenPDF = async () => {
+    if (!lesson) return;
+
+    setLoading(true);
+
+    try {
+      // Get the PDF asset from the bundled assets
+      // The require statement needs to be dynamic based on the lesson filename
+      // For simplicity, we'll use a mapping approach
+      const lessonAssets: { [key: string]: any } = {
+        'Teach them to study - 1.pdf': require('../../assets/lessons/Teach them to study - 1.pdf'),
+        'Teach them to seek God - 2.pdf': require('../../assets/lessons/Teach them to seek God - 2.pdf'),
+        'Teach them to avoid evil company - 3.pdf': require('../../assets/lessons/Teach them to avoid evil company - 3.pdf'),
+        'Abraham - 4.pdf': require('../../assets/lessons/Abraham - 4.pdf'),
+        'Burial - 5.pdf': require('../../assets/lessons/Burial - 5.pdf'),
+        'Widowhood - 6.pdf': require('../../assets/lessons/Widowhood - 6.pdf'),
+        'SUB-THEME- Familly Vices 1- Remiss - 7.pdf': require('../../assets/lessons/SUB-THEME- Familly Vices 1- Remiss - 7.pdf'),
+        'Family Vices 2 - Infidelity - 8.pdf': require('../../assets/lessons/Family Vices 2 - Infidelity - 8.pdf'),
+        'Family Vices 3 - Adultery - 9.pdf': require('../../assets/lessons/Family Vices 3 - Adultery - 9.pdf'),
+        'Family Vices 4 - Separation - 10.pdf': require('../../assets/lessons/Family Vices 4 - Separation - 10.pdf'),
+        'Fathers, Where are you - 11.pdf': require('../../assets/lessons/Fathers, Where are you - 11.pdf'),
+        'Family Vices 5 - Divorce - 12.pdf': require('../../assets/lessons/Family Vices 5 - Divorce - 12.pdf'),
+        'Envy - 13.pdf': require('../../assets/lessons/Envy - 13.pdf'),
+        'Unforgiveness - 14.pdf': require('../../assets/lessons/Unforgiveness - 14.pdf'),
+        'Rebellion - 15.pdf': require('../../assets/lessons/Rebellion - 15.pdf'),
+        'Modesty - 16.pdf': require('../../assets/lessons/Modesty - 16.pdf'),
+        'Loyalty - 17.pdf': require('../../assets/lessons/Loyalty - 17.pdf'),
+        'The fundamental principles of loyalty - 18.pdf': require('../../assets/lessons/The fundamental principles of loyalty - 18.pdf'),
+        'Attitude and habits of a loyal individual towards his church - 19.pdf': require('../../assets/lessons/Attitude and habits of a loyal individual towards his church - 19.pdf'),
+        'The Three tests of loyalty - 20.pdf': require('../../assets/lessons/The Three tests of loyalty - 20.pdf'),
+        'Gratitude and testimonies - 21.pdf': require('../../assets/lessons/Gratitude and testimonies - 21.pdf'),
+        'Understanding Harvest - 22.pdf': require('../../assets/lessons/Understanding Harvest - 22.pdf'),
+        'The Rewards of service - 23.pdf': require('../../assets/lessons/The Rewards of service - 23.pdf'),
+        'Why his Birth - 24.pdf': require('../../assets/lessons/Why his Birth - 24.pdf'),
+      };
+
+      const pdfAsset = lessonAssets[lesson.filename];
+
+      if (!pdfAsset) {
+        Alert.alert('Error', 'PDF file not found in assets');
+        setLoading(false);
+        return;
+      }
+
+      // Load the asset
+      const asset = Asset.fromModule(pdfAsset);
+      await asset.downloadAsync();
+
+      // Check if sharing is available
+      const isAvailable = await Sharing.isAvailableAsync();
+
+      if (isAvailable && asset.localUri) {
+        // Open the PDF using the system's default PDF viewer
+        await Sharing.shareAsync(asset.localUri, {
+          mimeType: 'application/pdf',
+          dialogTitle: lesson.title,
+          UTI: 'com.adobe.pdf',
+        });
+      } else {
+        Alert.alert(
+          'Cannot Open PDF',
+          'PDF viewing is not available on this device. Please install a PDF viewer app.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error: any) {
+      console.error('Error opening PDF:', error);
+      Alert.alert(
+        'Error',
+        'Failed to open PDF. Please try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleShareLesson = () => {
