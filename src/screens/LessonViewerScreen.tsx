@@ -291,6 +291,8 @@ const LessonViewerScreen: React.FC<LessonViewerScreenProps> = ({ route, navigati
           <CustomButton
             title="Open PDF"
             onPress={handleOpenPDF}
+            loading={loading}
+            disabled={loading}
             style={styles.button}
           />
           <CustomButton
