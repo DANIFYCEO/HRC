@@ -93,11 +93,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const handleSignUp = async () => {
     const isNameValid = validateName(name);
     const isEmailValid = validateEmail(email);
-    const isPhoneValid = validatePhone(phone);
     const isPasswordValid = validatePassword(password);
     const isConfirmPasswordValid = validateConfirmPassword(confirmPassword);
 
-    if (!isNameValid || !isEmailValid || !isPhoneValid || !isPasswordValid || !isConfirmPasswordValid) {
+    if (!isNameValid || !isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
       return;
     }
 
@@ -112,7 +111,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         await createUser(user.uid, {
           name: name.trim(),
           email: email.trim(),
-          phone: phone.trim() || null, // Store phone number if provided
         });
       } catch (firestoreError) {
         console.error('Failed to create user document:', firestoreError);
