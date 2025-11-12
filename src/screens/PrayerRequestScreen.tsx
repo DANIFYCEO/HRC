@@ -240,13 +240,13 @@ const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation })
         {/* Information Banner */}
         <View style={styles.infoBanner}>
           <Ionicons
-            name="logo-whatsapp"
+            name="heart-outline"
             size={24}
             color={colors.primary}
             style={styles.infoIcon}
           />
           <Text style={styles.infoText}>
-            Your prayer request will be sent directly to Pastor's WhatsApp
+            Share your prayer request with Pastor. Choose how you'd like to submit it below.
           </Text>
         </View>
 
