@@ -24,6 +24,7 @@ import {
 // Collection names
 const USERS = 'users';
 const READING_PROGRESS = 'reading_progress';
+const PRAYER_REQUESTS = 'prayer_requests';
 const EVENTS = 'events';
 const APP_SETTINGS = 'app_settings';
 
