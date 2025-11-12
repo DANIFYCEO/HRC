@@ -1,9 +1,9 @@
 // LessonViewerScreen - PDF viewer for Sunday School lessons
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Platform, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
 import { Asset } from 'expo-asset';
 import { useTheme } from '../context/ThemeContext';
 import { LessonViewerScreenProps } from '../types/navigation';
