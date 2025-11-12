@@ -142,8 +142,6 @@ export const onAuthChange = (callback: (user: FirebaseUser | null) => void) => {
 export default {
   signUp,
   signIn,
-  signInWithPhone,
-  sendPhoneVerification,
   logOut,
   resetPassword,
   updateUserProfile,
