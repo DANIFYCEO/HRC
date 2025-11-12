@@ -337,6 +337,84 @@ const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation })
           </View>
         </View>
 
+        {/* Submission Method Selection */}
+        <View style={styles.methodContainer}>
+          <Text style={styles.sectionTitle}>How to Submit</Text>
+          <View style={styles.methodOptions}>
+            <TouchableOpacity
+              style={[
+                styles.methodOption,
+                method === 'firebase' && styles.methodOptionSelected,
+              ]}
+              onPress={() => setMethod('firebase')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="cloud-upload"
+                size={24}
+                color={method === 'firebase' ? colors.primary : colors.textSecondary}
+                style={styles.methodIcon}
+              />
+              <Text
+                style={[
+                  styles.methodLabel,
+                  method === 'firebase' && styles.methodLabelSelected,
+                ]}
+              >
+                Save in App
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.methodOption,
+                method === 'whatsapp' && styles.methodOptionSelected,
+              ]}
+              onPress={() => setMethod('whatsapp')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="logo-whatsapp"
+                size={24}
+                color={method === 'whatsapp' ? colors.primary : colors.textSecondary}
+                style={styles.methodIcon}
+              />
+              <Text
+                style={[
+                  styles.methodLabel,
+                  method === 'whatsapp' && styles.methodLabelSelected,
+                ]}
+              >
+                Send to Pastor
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.methodOption,
+                method === 'both' && styles.methodOptionSelected,
+              ]}
+              onPress={() => setMethod('both')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="checkmark-done"
+                size={24}
+                color={method === 'both' ? colors.primary : colors.textSecondary}
+                style={styles.methodIcon}
+              />
+              <Text
+                style={[
+                  styles.methodLabel,
+                  method === 'both' && styles.methodLabelSelected,
+                ]}
+              >
+                Both
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Submit Button */}
         <CustomButton
           title="Send to Pastor"
