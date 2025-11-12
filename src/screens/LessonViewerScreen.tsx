@@ -175,22 +175,29 @@ const LessonViewerScreen: React.FC<LessonViewerScreenProps> = ({ route, navigati
       const asset = Asset.fromModule(pdfAsset);
       await asset.downloadAsync();
 
-      // Check if sharing is available
-      const isAvailable = await Sharing.isAvailableAsync();
-
-      if (isAvailable && asset.localUri) {
-        // Open the PDF using the system's default PDF viewer
-        await Sharing.shareAsync(asset.localUri, {
-          mimeType: 'application/pdf',
-          dialogTitle: lesson.title,
-          UTI: 'com.adobe.pdf',
+      if (asset.localUri) {
+        // Copy the asset to a accessible location
+        const destinationUri = `${FileSystem.documentDirectory}${lesson.filename}`;
+        await FileSystem.copyAsync({
+          from: asset.localUri,
+          to: destinationUri,
         });
+
+        // Try to open the PDF with Linking
+        const canOpen = await Linking.canOpenURL(destinationUri);
+
+        if (canOpen) {
+          await Linking.openURL(destinationUri);
+        } else {
+          // Fallback: show information about the file
+          Alert.alert(
+            'PDF Ready',
+            `The PDF "${lesson.title}" has been prepared. You can find it in your app's documents folder as "${lesson.filename}".`,
+            [{ text: 'OK' }]
+          );
+        }
       } else {
-        Alert.alert(
-          'Cannot Open PDF',
-          'PDF viewing is not available on this device. Please install a PDF viewer app.',
-          [{ text: 'OK' }]
-        );
+        Alert.alert('Error', 'Could not access PDF file');
       }
     } catch (error: any) {
       console.error('Error opening PDF:', error);
