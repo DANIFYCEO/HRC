@@ -64,25 +64,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
     return true;
   };
 
-  const validatePhone = (phone: string): boolean => {
-    // Phone is optional, but if provided, validate it
-    if (!phone.trim()) {
-      setPhoneError(''); // Clear error if empty
-      return true;
-    }
-    // Remove all non-digit characters
-    const phoneDigits = phone.replace(/\D/g, '');
-    // Nigerian phone numbers: +234 or 080, 081, 070, 090, 091
-    const isValidNigerian = phoneDigits.length >= 10 && phoneDigits.length <= 15;
-
-    if (!isValidNigerian) {
-      setPhoneError('Please enter a valid Nigerian phone number');
-      return false;
-    }
-    setPhoneError('');
-    return true;
-  };
-
   const validatePassword = (password: string): boolean => {
     if (!password) {
       setPasswordError('Password is required');
