@@ -7,14 +7,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { ProfileEditScreenProps } from '../types/navigation';
@@ -30,16 +27,12 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
 
   const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [phoneError, setPhoneError] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const [localPhotoUri, setLocalPhotoUri] = useState<string | null>(null);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
     // Pre-fill with current user data
