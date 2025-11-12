@@ -82,15 +82,6 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     return true;
   };
 
-  const validatePhone = (phone: string): boolean => {
-    if (phone && phone.length < 10) {
-      setPhoneError('Please enter a valid phone number');
-      return false;
-    }
-    setPhoneError('');
-    return true;
-  };
-
   const handleSave = async () => {
     const isNameValid = validateName(name);
     const isEmailValid = validateEmail(email);
