@@ -208,42 +208,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     scrollContent: {
       padding: Layout.spacing.lg,
     },
-    photoSection: {
-      alignItems: 'center',
-      marginBottom: Layout.spacing.xl,
-    },
-    photoContainer: {
-      width: 120,
-      height: 120,
-      borderRadius: 60,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: Layout.spacing.md,
-      overflow: 'hidden',
-    },
-    photo: {
-      width: '100%',
-      height: '100%',
-    },
-    photoIcon: {
-      // Default icon styling
-    },
-    changePhotoButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: Layout.spacing.lg,
-      paddingVertical: Layout.spacing.sm,
-      backgroundColor: `${colors.primary}20`,
-      borderRadius: Layout.borderRadius.md,
-    },
-    changePhotoText: {
-      fontSize: Layout.fontSize.sm,
-      fontWeight: '600',
-      color: colors.primary,
-      marginLeft: Layout.spacing.sm,
-    },
-    form: {
+        form: {
       marginBottom: Layout.spacing.lg,
     },
     inputContainer: {
