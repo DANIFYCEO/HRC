@@ -39,7 +39,6 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     if (userProfile) {
       setName(userProfile.name || '');
       setEmail(userProfile.email || '');
-      setPhone(userProfile.phone || '');
     }
   }, [userProfile]);
 
@@ -48,10 +47,9 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     if (userProfile) {
       const nameChanged = name !== (userProfile.name || '');
       const emailChanged = email !== (userProfile.email || '');
-      const phoneChanged = phone !== (userProfile.phone || '');
-      setHasChanges(nameChanged || emailChanged || phoneChanged);
+      setHasChanges(nameChanged || emailChanged);
     }
-  }, [name, email, phone, userProfile]);
+  }, [name, email, userProfile]);
 
   const validateName = (name: string): boolean => {
     if (!name) {
