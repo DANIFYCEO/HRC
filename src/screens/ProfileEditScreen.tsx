@@ -115,11 +115,48 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     }
 
     setLoading(true);
+    let photoURL: string | null = null;
 
     try {
+      // Upload photo if changed
+      if (localPhotoUri) {
+        setUploadingPhoto(true);
+
+        try {
+          // Create blob from image
+          const response = await fetch(localPhotoUri);
+          const blob = await response.blob();
+
+          // Create reference to Firebase Storage
+          const storage = getStorage();
+          const storageRef = ref(storage, `profile_photos/${user.uid}.jpg`);
+
+          // Upload the image
+          await uploadBytes(storageRef, blob);
+
+          // Get download URL
+          photoURL = await getDownloadURL(storageRef);
+
+          // Update Firebase Auth profile with photo URL
+          await updateUserProfile(user, { photoURL });
+        } catch (photoError: any) {
+          console.error('Photo upload error:', photoError);
+          Alert.alert(
+            'Photo Upload Failed',
+            'Failed to upload photo. Your profile will be updated without the photo.',
+            [{ text: 'OK' }]
+          );
+        } finally {
+          setUploadingPhoto(false);
+        }
+      }
+
       // Update Firebase Auth profile if name changed
       if (name !== user.displayName) {
-        await updateUserProfile(user, { displayName: name.trim() });
+        await updateUserProfile(user, { displayName: name.trim(), photoURL });
+      } else if (photoURL && !localPhotoUri) {
+        // Only photo changed
+        await updateUserProfile(user, { photoURL });
       }
 
       // Update email in Firebase Auth if changed
@@ -148,6 +185,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
         name: name.trim(),
         email: email.trim(),
         phone: phone.trim() || undefined,
+        photoURL: photoURL || user.photoURL,
       });
 
       Alert.alert('Success', 'Your profile has been updated successfully.', [
