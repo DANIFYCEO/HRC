@@ -11,20 +11,24 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import { PrayerRequestScreenProps } from '../types/navigation';
 import { Layout } from '../constants/Layout';
 import { sendPrayerRequest } from '../utils/whatsapp';
+import { savePrayerRequest } from '../services/firestore';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 
 const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
+  const { user, isGuest } = useAuth();
 
   // Form state
   const [name, setName] = useState('');
   const [request, setRequest] = useState('');
   const [contact, setContact] = useState('');
   const [urgency, setUrgency] = useState<'routine' | 'urgent'>('routine');
+  const [method, setMethod] = useState<'firebase' | 'whatsapp' | 'both'>('whatsapp');
   const [loading, setLoading] = useState(false);
 
   // Validation errors
