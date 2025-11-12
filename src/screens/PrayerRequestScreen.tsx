@@ -100,6 +100,37 @@ const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation })
       marginTop: Layout.spacing.md,
       marginBottom: Layout.spacing.xxl,
     },
+    methodContainer: {
+      marginBottom: Layout.spacing.lg,
+    },
+    methodOptions: {
+      flexDirection: 'row',
+      gap: Layout.spacing.sm,
+    },
+    methodOption: {
+      flex: 1,
+      padding: Layout.spacing.md,
+      borderRadius: Layout.borderRadius.md,
+      borderWidth: 2,
+      borderColor: colors.border,
+      alignItems: 'center',
+    },
+    methodOptionSelected: {
+      borderColor: colors.primary,
+      backgroundColor: `${colors.primary}10`,
+    },
+    methodIcon: {
+      marginBottom: Layout.spacing.sm,
+    },
+    methodLabel: {
+      fontSize: Layout.fontSize.sm,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    methodLabelSelected: {
+      color: colors.primary,
+    },
   });
 
   const validate = (): boolean => {
