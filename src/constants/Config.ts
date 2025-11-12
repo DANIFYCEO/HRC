@@ -14,14 +14,13 @@ export const Config = {
   },
 
   // Firebase Configuration
-  // TODO: Replace with actual Firebase project credentials from Firebase Console
   firebase: {
-    apiKey: '',
-    authDomain: '',
-    projectId: '',
-    storageBucket: '',
-    messagingSenderId: '',
-    appId: '',
+    apiKey: 'AIzaSyDmo9dxOTlTgwhpJ26BqKIYaZLPNUXVapA',
+    authDomain: 'hrc-app-e7d59.firebaseapp.com',
+    projectId: 'hrc-app-e7d59',
+    storageBucket: 'hrc-app-e7d59.appspot.com',
+    messagingSenderId: '966073822149',
+    appId: '1:966073822149:android:b1621ebbf0061f87a2f9ac',
   },
 
   // Storage keys for AsyncStorage
