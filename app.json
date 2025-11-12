@@ -41,8 +41,7 @@
     },
     "plugins": [
       "expo-image-picker",
-      "expo-notifications",
-      "expo-sharing"
+      "expo-notifications"
     ],
     "extra": {
       "eas": {
