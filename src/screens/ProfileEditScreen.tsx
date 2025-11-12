@@ -174,13 +174,39 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     }
   };
 
-  const handleChangePhoto = () => {
-    // TODO: Implement image picker when ready
-    Alert.alert(
-      'Change Photo',
-      'Photo upload will be available in a future update.',
-      [{ text: 'OK' }]
-    );
+  const handleChangePhoto = async () => {
+    // Request permission
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access camera roll is required to change profile photo.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    const options = {
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: false,
+    };
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync(options);
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        const asset = result.assets[0];
+        setLocalPhotoUri(asset.uri);
+        setHasChanges(true);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image. Please try again.', [{ text: 'OK' }]);
+    }
   };
 
   const handleChangePassword = () => {
