@@ -354,18 +354,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
               )}
             </View>
 
-            <View style={styles.inputContainer}>
-              <CustomInput
-                label="Phone Number (Optional)"
-                value={phone}
-                onChangeText={setPhone}
-                onBlur={() => validatePhone(phone)}
-                placeholder="Enter your phone number"
-                keyboardType="phone-pad"
-                error={phoneError}
-              />
-            </View>
-
+            
             <TouchableOpacity
               onPress={handleChangePassword}
               style={styles.changePasswordButton}
