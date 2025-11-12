@@ -417,7 +417,13 @@ const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation })
 
         {/* Submit Button */}
         <CustomButton
-          title="Send to Pastor"
+          title={
+            method === 'firebase'
+              ? 'Save Prayer Request'
+              : method === 'whatsapp'
+              ? 'Send to Pastor'
+              : 'Save & Send Prayer Request'
+          }
           onPress={handleSubmit}
           loading={loading}
           disabled={loading}
