@@ -142,9 +142,57 @@ export const onAuthChange = (callback: (user: FirebaseUser | null) => void) => {
   return onAuthStateChanged(auth, callback);
 };
 
+/**
+ * Sign in with phone number
+ */
+export const signInWithPhone = async (
+  phoneNumber: string,
+  verificationCode: string
+): Promise<FirebaseUser> => {
+  try {
+    const authInstance = getAuthInstance();
+
+    // Create phone auth provider
+    const phoneAuthProvider = new PhoneAuthProvider(authInstance);
+
+    // Create credential with verification code
+    const credential = phoneAuthProvider.credential(verificationCode);
+
+    // Sign in with credential
+    const userCredential = await signInWithCredential(authInstance, credential);
+    return userCredential.user;
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to sign in with phone number');
+  }
+};
+
+/**
+ * Send phone verification code
+ */
+export const sendPhoneVerification = async (
+  phoneNumber: string,
+  recaptchaVerifier: RecaptchaVerifier
+): Promise<string> => {
+  try {
+    const authInstance = getAuthInstance();
+    const phoneAuthProvider = new PhoneAuthProvider(authInstance);
+
+    const verificationId = await phoneAuthProvider.verifyPhoneNumber(
+      phoneNumber,
+      recaptchaVerifier
+    );
+
+    return verificationId;
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to send verification code');
+  }
+};
+
 export default {
   signUp,
   signIn,
+  signInWithPhone,
+  sendPhoneVerification,
   logOut,
   resetPassword,
   updateUserProfile,
