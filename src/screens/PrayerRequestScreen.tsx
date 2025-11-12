@@ -158,45 +158,75 @@ const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation })
   };
 
   const handleSubmit = async () => {
-    if (!validate()) {
-      return;
-    }
+    if (!validate()) return;
 
     setLoading(true);
 
     try {
-      const success = await sendPrayerRequest(
-        name.trim(),
-        request.trim(),
-        contact.trim() || undefined,
-        urgency
-      );
+      // Save to Firebase if selected
+      if (method === 'firebase' || method === 'both') {
+        if (isGuest) {
+          Alert.alert('Sign In Required', 'Please sign in to save prayer requests to your account.');
+          setLoading(false);
+          return;
+        }
 
-      if (success) {
-        // Show success message
-        Alert.alert(
-          'Prayer Request Sent',
-          'Your prayer request has been sent to Pastor via WhatsApp.',
-          [
-            {
-              text: 'Done',
-              onPress: () => {
-                // Clear form
-                setName('');
-                setRequest('');
-                setContact('');
-                setUrgency('routine');
-                // Navigate back
-                navigation.goBack();
-              },
-            },
-          ]
+        await savePrayerRequest({
+          name: name.trim(),
+          request: request.trim(),
+          contact: contact.trim() || null,
+          urgency,
+          userId: user!.uid,
+          createdAt: new Date(),
+          status: 'pending'
+        });
+      }
+
+      // Send via WhatsApp if selected
+      if (method === 'whatsapp' || method === 'both') {
+        await sendPrayerRequest(
+          name.trim(),
+          request.trim(),
+          contact.trim() || undefined,
+          urgency
         );
       }
-    } catch (error) {
+
+      // Success message based on method
+      let message;
+      switch (method) {
+        case 'firebase':
+          message = 'Prayer request saved successfully to your account.';
+          break;
+        case 'whatsapp':
+          message = 'Prayer request sent to Pastor via WhatsApp successfully.';
+          break;
+        case 'both':
+          message = 'Prayer request saved and sent to Pastor via WhatsApp successfully.';
+          break;
+      }
+
+      Alert.alert('Success', message, [
+        {
+          text: 'Done',
+          onPress: () => {
+            // Clear form
+            setName('');
+            setRequest('');
+            setContact('');
+            setUrgency('routine');
+            setMethod('whatsapp');
+            // Navigate back
+            navigation.goBack();
+          },
+        },
+      ]);
+
+    } catch (error: any) {
+      console.error('Prayer request error:', error);
       Alert.alert(
         'Error',
-        'Failed to send prayer request. Please try again.',
+        'Failed to submit prayer request. Please try again.',
         [{ text: 'OK' }]
       );
     } finally {
