@@ -322,31 +322,6 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Profile Photo */}
-          <View style={styles.photoSection}>
-            <View style={styles.photoContainer}>
-              {(localPhotoUri || user.photoURL) ? (
-                <Image source={{ uri: localPhotoUri || user.photoURL }} style={styles.photo} />
-              ) : (
-                <Ionicons name="person" size={60} color="#FFFFFF" style={styles.photoIcon} />
-              )}
-            </View>
-            <TouchableOpacity
-              onPress={handleChangePhoto}
-              style={styles.changePhotoButton}
-              disabled={uploadingPhoto}
-            >
-              {uploadingPhoto ? (
-                <Ionicons name="reload" size={18} color={colors.primary} />
-              ) : (
-                <Ionicons name="camera" size={18} color={colors.primary} />
-              )}
-              <Text style={styles.changePhotoText}>
-                {uploadingPhoto ? 'Uploading...' : 'Change Photo'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
           {/* Form */}
           <View style={styles.form}>
             <View style={styles.inputContainer}>
