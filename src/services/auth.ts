@@ -8,10 +8,6 @@ import {
   updateProfile,
   updateEmail,
   updatePassword,
-  signInWithPhoneNumber,
-  getAuth,
-  RecaptchaVerifier,
-  PhoneAuthProvider,
   User as FirebaseUser,
   onAuthStateChanged,
 } from 'firebase/auth';
