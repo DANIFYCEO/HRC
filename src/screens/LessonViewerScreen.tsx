@@ -1,8 +1,10 @@
 // LessonViewerScreen - PDF viewer for Sunday School lessons
 
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Platform, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system';
+import { Asset } from 'expo-asset';
 import { useTheme } from '../context/ThemeContext';
 import { LessonViewerScreenProps } from '../types/navigation';
 import { Layout } from '../constants/Layout';
@@ -13,6 +15,7 @@ import { shareContent } from '../utils/sharing';
 const LessonViewerScreen: React.FC<LessonViewerScreenProps> = ({ route, navigation }) => {
   const { colors } = useTheme();
   const { lessonId, lessonTitle } = route.params;
+  const [loading, setLoading] = useState(false);
 
   const lesson = getLessonById(lessonId);
 
@@ -124,13 +127,88 @@ const LessonViewerScreen: React.FC<LessonViewerScreenProps> = ({ route, navigati
     },
   });
 
-  const handleOpenPDF = () => {
-    // TODO: Implement PDF opening once files are in assets
-    Alert.alert(
-      'PDF Not Available',
-      `The PDF file for "${lessonTitle}" should be placed in:\n\nassets/lessons/${lesson?.filename}\n\nOnce the file is added, it will open automatically.`,
-      [{ text: 'OK' }]
-    );
+  const handleOpenPDF = async () => {
+    if (!lesson) return;
+
+    setLoading(true);
+
+    try {
+      // Get the PDF asset from the bundled assets
+      // The require statement needs to be dynamic based on the lesson filename
+      // For simplicity, we'll use a mapping approach
+      const lessonAssets: { [key: string]: any } = {
+        'Teach them to study - 1.pdf': require('../../assets/lessons/Teach them to study - 1.pdf'),
+        'Teach them to seek God - 2.pdf': require('../../assets/lessons/Teach them to seek God - 2.pdf'),
+        'Teach them to avoid evil company - 3.pdf': require('../../assets/lessons/Teach them to avoid evil company - 3.pdf'),
+        'Abraham - 4.pdf': require('../../assets/lessons/Abraham - 4.pdf'),
+        'Burial - 5.pdf': require('../../assets/lessons/Burial - 5.pdf'),
+        'Widowhood - 6.pdf': require('../../assets/lessons/Widowhood - 6.pdf'),
+        'SUB-THEME- Familly Vices 1- Remiss - 7.pdf': require('../../assets/lessons/SUB-THEME- Familly Vices 1- Remiss - 7.pdf'),
+        'Family Vices 2 - Infidelity - 8.pdf': require('../../assets/lessons/Family Vices 2 - Infidelity - 8.pdf'),
+        'Family Vices 3 - Adultery - 9.pdf': require('../../assets/lessons/Family Vices 3 - Adultery - 9.pdf'),
+        'Family Vices 4 - Separation - 10.pdf': require('../../assets/lessons/Family Vices 4 - Separation - 10.pdf'),
+        'Fathers, Where are you - 11.pdf': require('../../assets/lessons/Fathers, Where are you - 11.pdf'),
+        'Family Vices 5 - Divorce - 12.pdf': require('../../assets/lessons/Family Vices 5 - Divorce - 12.pdf'),
+        'Envy - 13.pdf': require('../../assets/lessons/Envy - 13.pdf'),
+        'Unforgiveness - 14.pdf': require('../../assets/lessons/Unforgiveness - 14.pdf'),
+        'Rebellion - 15.pdf': require('../../assets/lessons/Rebellion - 15.pdf'),
+        'Modesty - 16.pdf': require('../../assets/lessons/Modesty - 16.pdf'),
+        'Loyalty - 17.pdf': require('../../assets/lessons/Loyalty - 17.pdf'),
+        'The fundamental principles of loyalty - 18.pdf': require('../../assets/lessons/The fundamental principles of loyalty - 18.pdf'),
+        'Attitude and habits of a loyal individual towards his church - 19.pdf': require('../../assets/lessons/Attitude and habits of a loyal individual towards his church - 19.pdf'),
+        'The Three tests of loyalty - 20.pdf': require('../../assets/lessons/The Three tests of loyalty - 20.pdf'),
+        'Gratitude and testimonies - 21.pdf': require('../../assets/lessons/Gratitude and testimonies - 21.pdf'),
+        'Understanding Harvest - 22.pdf': require('../../assets/lessons/Understanding Harvest - 22.pdf'),
+        'The Rewards of service - 23.pdf': require('../../assets/lessons/The Rewards of service - 23.pdf'),
+        'Why his Birth - 24.pdf': require('../../assets/lessons/Why his Birth - 24.pdf'),
+      };
+
+      const pdfAsset = lessonAssets[lesson.filename];
+
+      if (!pdfAsset) {
+        Alert.alert('Error', 'PDF file not found in assets');
+        setLoading(false);
+        return;
+      }
+
+      // Load the asset
+      const asset = Asset.fromModule(pdfAsset);
+      await asset.downloadAsync();
+
+      if (asset.localUri) {
+        // Copy the asset to a accessible location
+        const destinationUri = `${FileSystem.documentDirectory}${lesson.filename}`;
+        await FileSystem.copyAsync({
+          from: asset.localUri,
+          to: destinationUri,
+        });
+
+        // Try to open the PDF with Linking
+        const canOpen = await Linking.canOpenURL(destinationUri);
+
+        if (canOpen) {
+          await Linking.openURL(destinationUri);
+        } else {
+          // Fallback: show information about the file
+          Alert.alert(
+            'PDF Ready',
+            `The PDF "${lesson.title}" has been prepared. You can find it in your app's documents folder as "${lesson.filename}".`,
+            [{ text: 'OK' }]
+          );
+        }
+      } else {
+        Alert.alert('Error', 'Could not access PDF file');
+      }
+    } catch (error: any) {
+      console.error('Error opening PDF:', error);
+      Alert.alert(
+        'Error',
+        'Failed to open PDF. Please try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleShareLesson = () => {
@@ -163,14 +241,11 @@ const LessonViewerScreen: React.FC<LessonViewerScreenProps> = ({ route, navigati
           <Text style={styles.lessonSubtitle}>Lesson {lesson.id} of 24</Text>
         </View>
 
-        {/* Instructions Card */}
+        {/* Info Card */}
         <View style={styles.instructionsCard}>
-          <Text style={styles.instructionsTitle}>📚 How to Add This Lesson</Text>
+          <Text style={styles.instructionsTitle}>📚 About This Lesson</Text>
           <Text style={styles.instructionsText}>
-            To view this lesson, place the PDF file in your project's assets folder:
-          </Text>
-          <Text style={styles.filenameText}>
-            assets/lessons/{lesson.filename}
+            Tap "Open PDF" below to view this Sunday School lesson. The PDF will open in your device's default PDF viewer.
           </Text>
         </View>
 
@@ -223,6 +298,8 @@ const LessonViewerScreen: React.FC<LessonViewerScreenProps> = ({ route, navigati
           <CustomButton
             title="Open PDF"
             onPress={handleOpenPDF}
+            loading={loading}
+            disabled={loading}
             style={styles.button}
           />
           <CustomButton

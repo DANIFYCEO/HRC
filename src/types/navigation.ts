@@ -10,6 +10,7 @@ export type RootStackParamList = {
   SignIn: undefined;
   SignUp: undefined;
   BibleScreen: undefined;
+  BibleChapterScreen: { bookId: string; bookName: string; chapterNum: number };
   SundaySchoolScreen: undefined;
   LessonViewerScreen: { lessonId: number; lessonTitle: string };
   ReadingPlanScreen: undefined;
@@ -41,6 +42,7 @@ export type HomeScreenProps = TabScreenProps<'Home'>;
 export type EventsScreenProps = TabScreenProps<'Events'>;
 export type SettingsScreenProps = TabScreenProps<'Settings'>;
 export type BibleScreenProps = StackScreenNavigationProp<'BibleScreen'>;
+export type BibleChapterScreenProps = StackScreenNavigationProp<'BibleChapterScreen'>;
 export type SundaySchoolScreenProps = StackScreenNavigationProp<'SundaySchoolScreen'>;
 export type LessonViewerScreenProps = StackScreenNavigationProp<'LessonViewerScreen'>;
 export type ReadingPlanScreenProps = StackScreenNavigationProp<'ReadingPlanScreen'>;

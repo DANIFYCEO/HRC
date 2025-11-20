@@ -7,7 +7,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -28,11 +27,9 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
 
   const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [phoneError, setPhoneError] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -42,7 +39,6 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     if (userProfile) {
       setName(userProfile.name || '');
       setEmail(userProfile.email || '');
-      setPhone(userProfile.phone || '');
     }
   }, [userProfile]);
 
@@ -51,10 +47,9 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     if (userProfile) {
       const nameChanged = name !== (userProfile.name || '');
       const emailChanged = email !== (userProfile.email || '');
-      const phoneChanged = phone !== (userProfile.phone || '');
-      setHasChanges(nameChanged || emailChanged || phoneChanged);
+      setHasChanges(nameChanged || emailChanged);
     }
-  }, [name, email, phone, userProfile]);
+  }, [name, email, userProfile]);
 
   const validateName = (name: string): boolean => {
     if (!name) {
@@ -87,21 +82,11 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     return true;
   };
 
-  const validatePhone = (phone: string): boolean => {
-    if (phone && phone.length < 10) {
-      setPhoneError('Please enter a valid phone number');
-      return false;
-    }
-    setPhoneError('');
-    return true;
-  };
-
   const handleSave = async () => {
     const isNameValid = validateName(name);
     const isEmailValid = validateEmail(email);
-    const isPhoneValid = validatePhone(phone);
 
-    if (!isNameValid || !isEmailValid || !isPhoneValid) {
+    if (!isNameValid || !isEmailValid) {
       return;
     }
 
@@ -143,7 +128,6 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
       await updateUser(user.uid, {
         name: name.trim(),
         email: email.trim(),
-        phone: phone.trim() || undefined,
       });
 
       Alert.alert('Success', 'Your profile has been updated successfully.', [
@@ -170,15 +154,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     }
   };
 
-  const handleChangePhoto = () => {
-    // TODO: Implement image picker when ready
-    Alert.alert(
-      'Change Photo',
-      'Photo upload will be available in a future update.',
-      [{ text: 'OK' }]
-    );
-  };
-
+  
   const handleChangePassword = () => {
     Alert.alert(
       'Change Password',
@@ -232,42 +208,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
     scrollContent: {
       padding: Layout.spacing.lg,
     },
-    photoSection: {
-      alignItems: 'center',
-      marginBottom: Layout.spacing.xl,
-    },
-    photoContainer: {
-      width: 120,
-      height: 120,
-      borderRadius: 60,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: Layout.spacing.md,
-      overflow: 'hidden',
-    },
-    photo: {
-      width: '100%',
-      height: '100%',
-    },
-    photoIcon: {
-      // Default icon styling
-    },
-    changePhotoButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: Layout.spacing.lg,
-      paddingVertical: Layout.spacing.sm,
-      backgroundColor: `${colors.primary}20`,
-      borderRadius: Layout.borderRadius.md,
-    },
-    changePhotoText: {
-      fontSize: Layout.fontSize.sm,
-      fontWeight: '600',
-      color: colors.primary,
-      marginLeft: Layout.spacing.sm,
-    },
-    form: {
+        form: {
       marginBottom: Layout.spacing.lg,
     },
     inputContainer: {
@@ -346,21 +287,6 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Profile Photo */}
-          <View style={styles.photoSection}>
-            <View style={styles.photoContainer}>
-              {user.photoURL ? (
-                <Image source={{ uri: user.photoURL }} style={styles.photo} />
-              ) : (
-                <Ionicons name="person" size={60} color="#FFFFFF" style={styles.photoIcon} />
-              )}
-            </View>
-            <TouchableOpacity onPress={handleChangePhoto} style={styles.changePhotoButton}>
-              <Ionicons name="camera" size={18} color={colors.primary} />
-              <Text style={styles.changePhotoText}>Change Photo</Text>
-            </TouchableOpacity>
-          </View>
-
           {/* Form */}
           <View style={styles.form}>
             <View style={styles.inputContainer}>
@@ -393,18 +319,7 @@ const ProfileEditScreen: React.FC<ProfileEditScreenProps> = ({ navigation }) => 
               )}
             </View>
 
-            <View style={styles.inputContainer}>
-              <CustomInput
-                label="Phone Number (Optional)"
-                value={phone}
-                onChangeText={setPhone}
-                onBlur={() => validatePhone(phone)}
-                placeholder="Enter your phone number"
-                keyboardType="phone-pad"
-                error={phoneError}
-              />
-            </View>
-
+            
             <TouchableOpacity
               onPress={handleChangePassword}
               style={styles.changePasswordButton}

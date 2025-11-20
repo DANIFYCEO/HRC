@@ -3,6 +3,7 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithCredential,
   signOut,
   sendPasswordResetEmail,
   updateProfile,
@@ -137,6 +138,7 @@ export const onAuthChange = (callback: (user: FirebaseUser | null) => void) => {
   }
   return onAuthStateChanged(auth, callback);
 };
+
 
 export default {
   signUp,

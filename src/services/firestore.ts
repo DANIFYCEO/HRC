@@ -24,6 +24,7 @@ import {
 // Collection names
 const USERS = 'users';
 const READING_PROGRESS = 'reading_progress';
+const PRAYER_REQUESTS = 'prayer_requests';
 const EVENTS = 'events';
 const APP_SETTINGS = 'app_settings';
 
@@ -113,6 +114,69 @@ export const updateReadingProgress = async (
     });
   } catch (error: any) {
     throw new Error(`Failed to update reading progress: ${error.message}`);
+  }
+};
+
+/**
+ * Prayer request operations
+ */
+export const savePrayerRequest = async (data: {
+  name: string;
+  request: string;
+  contact: string | null;
+  urgency: 'routine' | 'urgent';
+  userId: string;
+  createdAt: Date;
+  status: 'pending' | 'answered';
+}) => {
+  try {
+    const firestore = getFirestoreInstance();
+    const prayerRef = doc(collection(firestore, PRAYER_REQUESTS));
+    await setDoc(prayerRef, {
+      ...data,
+      id: prayerRef.id,
+      createdAt: Timestamp.now(),
+    });
+    return prayerRef.id;
+  } catch (error: any) {
+    throw new Error(`Failed to save prayer request: ${error.message}`);
+  }
+};
+
+export const getUserPrayerRequests = async (userId: string) => {
+  try {
+    const firestore = getFirestoreInstance();
+    const q = query(
+      collection(firestore, PRAYER_REQUESTS),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+    }));
+  } catch (error: any) {
+    throw new Error(`Failed to get prayer requests: ${error.message}`);
+  }
+};
+
+export const deletePrayerRequest = async (requestId: string, userId: string) => {
+  try {
+    const firestore = getFirestoreInstance();
+    const requestRef = doc(firestore, PRAYER_REQUESTS, requestId);
+    // Verify user owns this request before deleting
+    const requestDoc = await getDoc(requestRef);
+    if (!requestDoc.exists()) {
+      throw new Error('Prayer request not found');
+    }
+    if (requestDoc.data().userId !== userId) {
+      throw new Error('Not authorized to delete this request');
+    }
+    await deleteDoc(requestRef);
+  } catch (error: any) {
+    throw new Error(`Failed to delete prayer request: ${error.message}`);
   }
 };
 
@@ -230,6 +294,9 @@ export default {
   createReadingProgress,
   getReadingProgress,
   updateReadingProgress,
+  savePrayerRequest,
+  getUserPrayerRequests,
+  deletePrayerRequest,
   createEvent,
   getEvents,
   getUpcomingEvents,

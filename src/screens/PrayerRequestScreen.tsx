@@ -11,20 +11,24 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import { PrayerRequestScreenProps } from '../types/navigation';
 import { Layout } from '../constants/Layout';
 import { sendPrayerRequest } from '../utils/whatsapp';
+import { savePrayerRequest } from '../services/firestore';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 
 const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
+  const { user, isGuest } = useAuth();
 
   // Form state
   const [name, setName] = useState('');
   const [request, setRequest] = useState('');
   const [contact, setContact] = useState('');
   const [urgency, setUrgency] = useState<'routine' | 'urgent'>('routine');
+  const [method, setMethod] = useState<'firebase' | 'whatsapp' | 'both'>('whatsapp');
   const [loading, setLoading] = useState(false);
 
   // Validation errors
@@ -96,6 +100,37 @@ const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation })
       marginTop: Layout.spacing.md,
       marginBottom: Layout.spacing.xxl,
     },
+    methodContainer: {
+      marginBottom: Layout.spacing.lg,
+    },
+    methodOptions: {
+      flexDirection: 'row',
+      gap: Layout.spacing.sm,
+    },
+    methodOption: {
+      flex: 1,
+      padding: Layout.spacing.md,
+      borderRadius: Layout.borderRadius.md,
+      borderWidth: 2,
+      borderColor: colors.border,
+      alignItems: 'center',
+    },
+    methodOptionSelected: {
+      borderColor: colors.primary,
+      backgroundColor: `${colors.primary}10`,
+    },
+    methodIcon: {
+      marginBottom: Layout.spacing.sm,
+    },
+    methodLabel: {
+      fontSize: Layout.fontSize.sm,
+      fontWeight: '600',
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    methodLabelSelected: {
+      color: colors.primary,
+    },
   });
 
   const validate = (): boolean => {
@@ -123,45 +158,75 @@ const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation })
   };
 
   const handleSubmit = async () => {
-    if (!validate()) {
-      return;
-    }
+    if (!validate()) return;
 
     setLoading(true);
 
     try {
-      const success = await sendPrayerRequest(
-        name.trim(),
-        request.trim(),
-        contact.trim() || undefined,
-        urgency
-      );
+      // Save to Firebase if selected
+      if (method === 'firebase' || method === 'both') {
+        if (isGuest) {
+          Alert.alert('Sign In Required', 'Please sign in to save prayer requests to your account.');
+          setLoading(false);
+          return;
+        }
 
-      if (success) {
-        // Show success message
-        Alert.alert(
-          'Prayer Request Sent',
-          'Your prayer request has been sent to Pastor via WhatsApp.',
-          [
-            {
-              text: 'Done',
-              onPress: () => {
-                // Clear form
-                setName('');
-                setRequest('');
-                setContact('');
-                setUrgency('routine');
-                // Navigate back
-                navigation.goBack();
-              },
-            },
-          ]
+        await savePrayerRequest({
+          name: name.trim(),
+          request: request.trim(),
+          contact: contact.trim() || null,
+          urgency,
+          userId: user!.uid,
+          createdAt: new Date(),
+          status: 'pending'
+        });
+      }
+
+      // Send via WhatsApp if selected
+      if (method === 'whatsapp' || method === 'both') {
+        await sendPrayerRequest(
+          name.trim(),
+          request.trim(),
+          contact.trim() || undefined,
+          urgency
         );
       }
-    } catch (error) {
+
+      // Success message based on method
+      let message;
+      switch (method) {
+        case 'firebase':
+          message = 'Prayer request saved successfully to your account.';
+          break;
+        case 'whatsapp':
+          message = 'Prayer request sent to Pastor via WhatsApp successfully.';
+          break;
+        case 'both':
+          message = 'Prayer request saved and sent to Pastor via WhatsApp successfully.';
+          break;
+      }
+
+      Alert.alert('Success', message, [
+        {
+          text: 'Done',
+          onPress: () => {
+            // Clear form
+            setName('');
+            setRequest('');
+            setContact('');
+            setUrgency('routine');
+            setMethod('whatsapp');
+            // Navigate back
+            navigation.goBack();
+          },
+        },
+      ]);
+
+    } catch (error: any) {
+      console.error('Prayer request error:', error);
       Alert.alert(
         'Error',
-        'Failed to send prayer request. Please try again.',
+        'Failed to submit prayer request. Please try again.',
         [{ text: 'OK' }]
       );
     } finally {
@@ -175,13 +240,13 @@ const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation })
         {/* Information Banner */}
         <View style={styles.infoBanner}>
           <Ionicons
-            name="logo-whatsapp"
+            name="heart-outline"
             size={24}
             color={colors.primary}
             style={styles.infoIcon}
           />
           <Text style={styles.infoText}>
-            Your prayer request will be sent directly to Pastor's WhatsApp
+            Share your prayer request with Pastor. Choose how you'd like to submit it below.
           </Text>
         </View>
 
@@ -272,9 +337,93 @@ const PrayerRequestScreen: React.FC<PrayerRequestScreenProps> = ({ navigation })
           </View>
         </View>
 
+        {/* Submission Method Selection */}
+        <View style={styles.methodContainer}>
+          <Text style={styles.sectionTitle}>How to Submit</Text>
+          <View style={styles.methodOptions}>
+            <TouchableOpacity
+              style={[
+                styles.methodOption,
+                method === 'firebase' && styles.methodOptionSelected,
+              ]}
+              onPress={() => setMethod('firebase')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="cloud-upload"
+                size={24}
+                color={method === 'firebase' ? colors.primary : colors.textSecondary}
+                style={styles.methodIcon}
+              />
+              <Text
+                style={[
+                  styles.methodLabel,
+                  method === 'firebase' && styles.methodLabelSelected,
+                ]}
+              >
+                Save in App
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.methodOption,
+                method === 'whatsapp' && styles.methodOptionSelected,
+              ]}
+              onPress={() => setMethod('whatsapp')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="logo-whatsapp"
+                size={24}
+                color={method === 'whatsapp' ? colors.primary : colors.textSecondary}
+                style={styles.methodIcon}
+              />
+              <Text
+                style={[
+                  styles.methodLabel,
+                  method === 'whatsapp' && styles.methodLabelSelected,
+                ]}
+              >
+                Send to Pastor
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.methodOption,
+                method === 'both' && styles.methodOptionSelected,
+              ]}
+              onPress={() => setMethod('both')}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="checkmark-done"
+                size={24}
+                color={method === 'both' ? colors.primary : colors.textSecondary}
+                style={styles.methodIcon}
+              />
+              <Text
+                style={[
+                  styles.methodLabel,
+                  method === 'both' && styles.methodLabelSelected,
+                ]}
+              >
+                Both
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Submit Button */}
         <CustomButton
-          title="Send to Pastor"
+          title={
+            method === 'firebase'
+              ? 'Save Prayer Request'
+              : method === 'whatsapp'
+              ? 'Send to Pastor'
+              : 'Save & Send Prayer Request'
+          }
           onPress={handleSubmit}
           loading={loading}
           disabled={loading}

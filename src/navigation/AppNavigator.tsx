@@ -13,6 +13,7 @@ import TabNavigator from './TabNavigator';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import BibleScreen from '../screens/BibleScreen';
+import BibleChapterScreen from '../screens/BibleChapterScreen';
 import SundaySchoolScreen from '../screens/SundaySchoolScreen';
 import LessonViewerScreen from '../screens/LessonViewerScreen';
 import ReadingPlanScreen from '../screens/ReadingPlanScreen';
@@ -67,7 +68,12 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="BibleScreen"
           component={BibleScreen}
-          options={{ title: 'Bible' }}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="BibleChapterScreen"
+          component={BibleChapterScreen}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="SundaySchoolScreen"
